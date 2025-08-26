@@ -1,0 +1,12 @@
+# Ignore sensitive configuration files
+config.ini
+
+# Ignore Telethon session files
+*.session
+*.session-journal
+
+# Ignore Python virtual environment
+venv/
+
+# Ignore pycache directories
+__pycache__/
