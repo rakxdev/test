@@ -4,7 +4,6 @@ import logging
 from telethon.sync import TelegramClient
 from telethon.tl.functions.messages import GetDialogFiltersRequest, UpdateDialogFilterRequest
 from telethon.tl.types import DialogFilter
-from telethon.utils import get_input_peer
 
 # --- Configuration ---
 # Set up basic logging to see the script's progress
@@ -93,7 +92,15 @@ async def main():
 
         # Step 2: Convert chat entities to InputPeer objects.
         # The API requires InputPeer types for folder manipulation.
-        desired_input_peers = [get_input_peer(c) for c in target_chats]
+        # We use client.get_input_entity for a robust conversion.
+        desired_input_peers = []
+        for entity in target_chats:
+            try:
+                peer = await client.get_input_entity(entity)
+                desired_input_peers.append(peer)
+            except Exception as e:
+                # Log a warning if a chat can't be converted, but continue.
+                logging.warning(f"Could not process chat '{getattr(entity, 'title', 'N/A')}': {e}")
 
         # Step 3: Get the current state of the folder.
         existing_folder = await get_or_create_folder(client, FOLDER_NAME, FOLDER_ID)
@@ -102,7 +109,6 @@ async def main():
         # This is the core of the idempotent logic.
 
         # Create sets of peer IDs for easy comparison.
-        # The logic to extract IDs is the same for both current and desired peers.
         def get_peer_id(peer):
             if hasattr(peer, 'channel_id'):
                 return peer.channel_id
@@ -112,7 +118,7 @@ async def main():
                 return peer.user_id
             return None
 
-        desired_peer_ids = {get_peer_id(p) for p in desired_input_peers}
+        desired_peer_ids = {get_peer_id(p) for p in desired_input_peers if p}
         current_peer_ids = set()
 
         folder_id_to_use = FOLDER_ID
