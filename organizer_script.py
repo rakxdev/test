@@ -3,7 +3,8 @@ import configparser
 import logging
 from telethon.sync import TelegramClient
 from telethon.tl.functions.messages import GetDialogFiltersRequest, UpdateDialogFilterRequest
-from telethon.tl.types import DialogFilter, InputPeerChannel, InputPeerChat, InputPeerUser
+from telethon.tl.types import DialogFilter
+from telethon.utils import get_input_peer
 
 # --- Configuration ---
 # Set up basic logging to see the script's progress
@@ -55,16 +56,6 @@ async def get_or_create_folder(client, folder_name, folder_id):
     logging.info(f"Folder '{folder_name}' not found. It will be created with ID {folder_id}.")
     return None
 
-def convert_entities_to_input_peers(entities):
-    """
-    Converts a list of Telethon entity objects to a list of InputPeer objects
-    required by the API for the include_peers list.
-    """
-    peers = []
-    for entity in entities:
-        # The get_input_entity method is the most reliable way to get the correct peer type
-        peers.append(entity)
-    return peers
 
 async def update_folder_state(client, folder_id, folder_name, desired_peers):
     """
@@ -100,9 +91,9 @@ async def main():
         # Step 1: Find all chats that should be in the folder.
         target_chats = await get_target_chats(client, CHAT_PREFIX)
 
-        # Step 2: Convert the list of entities to the InputPeer format required by the API.
-        # Telethon's client can often handle entity objects directly where InputPeers are expected.
-        desired_input_peers = target_chats
+        # Step 2: Convert chat entities to InputPeer objects.
+        # The API requires InputPeer types for folder manipulation.
+        desired_input_peers = [get_input_peer(c) for c in target_chats]
 
         # Step 3: Get the current state of the folder.
         existing_folder = await get_or_create_folder(client, FOLDER_NAME, FOLDER_ID)
@@ -111,17 +102,23 @@ async def main():
         # This is the core of the idempotent logic.
 
         # Create sets of peer IDs for easy comparison.
-        # The API expects InputPeer objects, but for comparison, IDs are sufficient and simpler.
-        desired_peer_ids = {peer.id for peer in desired_input_peers}
+        # The logic to extract IDs is the same for both current and desired peers.
+        def get_peer_id(peer):
+            if hasattr(peer, 'channel_id'):
+                return peer.channel_id
+            if hasattr(peer, 'chat_id'):
+                return peer.chat_id
+            if hasattr(peer, 'user_id'):
+                return peer.user_id
+            return None
+
+        desired_peer_ids = {get_peer_id(p) for p in desired_input_peers}
         current_peer_ids = set()
 
         folder_id_to_use = FOLDER_ID
         if existing_folder:
             folder_id_to_use = existing_folder.id
-            # The include_peers list might contain different types, so we need to get their IDs.
-            # For simplicity, we assume we can get an ID from each peer object.
-            # In a more complex scenario, you would need to handle different peer types.
-            current_peer_ids = {peer.channel_id if hasattr(peer, 'channel_id') else peer.chat_id if hasattr(peer, 'chat_id') else peer.user_id for peer in existing_folder.include_peers}
+            current_peer_ids = {get_peer_id(p) for p in existing_folder.include_peers}
 
         if desired_peer_ids == current_peer_ids:
             logging.info("Folder is already up-to-date. No changes needed.")
