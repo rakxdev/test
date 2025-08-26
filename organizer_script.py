@@ -47,7 +47,7 @@ async def get_or_create_folder(client, folder_name, folder_id):
     logging.info("Fetching existing chat folders (Dialog Filters)...")
     all_filters = await client(GetDialogFiltersRequest())
 
-    for f in all_filters:
+    for f in all_filters.filters:
         if isinstance(f, DialogFilter) and f.title == folder_name:
             logging.info(f"Found existing folder '{folder_name}' with ID {f.id}.")
             return f
