@@ -4,3 +4,4 @@ SQLAlchemy
 telethon
 pydantic-settings
 alembic
+python-multipart
