@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+SQLAlchemy
+telethon
+pydantic-settings
+alembic
