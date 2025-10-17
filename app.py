@@ -5,7 +5,7 @@ from database import (
     init_db, get_all_modes, get_mode_by_id, 
     update_mode_status, add_reading, get_recent_readings,
     get_all_readings, get_current_reading, set_mode_voltage,
-    get_mode_voltage
+    get_mode_voltage, get_filtered_records, get_statistics
 )
 from data_simulator import DataSimulator
 
@@ -44,8 +44,8 @@ def dashboard():
 @app.route('/records')
 def records():
     """Records page route."""
-    readings = get_all_readings(limit=1000)
-    return render_template('records.html', readings=readings)
+    modes = get_all_modes()
+    return render_template('records.html', modes=modes)
 
 
 @app.route('/api/modes')
@@ -200,6 +200,117 @@ def api_get_current_reading(mode_id):
         'mode_name': mode['name'],
         'message': 'No readings available yet'
     }), 404
+
+
+@app.route('/api/records')
+def api_get_records():
+    """API endpoint to get filtered and paginated records."""
+    try:
+        mode_id = request.args.get('mode_id', type=int)
+        start_time = request.args.get('start_time')
+        end_time = request.args.get('end_time')
+        min_value = request.args.get('min_value', type=float)
+        max_value = request.args.get('max_value', type=float)
+        limit = request.args.get('limit', 100, type=int)
+        offset = request.args.get('offset', 0, type=int)
+        aggregation = request.args.get('aggregation', 'raw')
+        
+        if limit < 1 or limit > 10000:
+            return jsonify({'error': 'Limit must be between 1 and 10000'}), 400
+        
+        if offset < 0:
+            return jsonify({'error': 'Offset must be non-negative'}), 400
+        
+        if mode_id is not None:
+            mode = get_mode_by_id(mode_id)
+            if not mode:
+                return jsonify({'error': f'Mode {mode_id} not found'}), 404
+        
+        if aggregation not in ['raw', '1min', '5min', '15min', '60min']:
+            return jsonify({'error': 'Invalid aggregation interval. Must be one of: raw, 1min, 5min, 15min, 60min'}), 400
+        
+        if start_time and end_time and start_time > end_time:
+            return jsonify({'error': 'start_time must be before end_time'}), 400
+        
+        if min_value is not None and max_value is not None and min_value > max_value:
+            return jsonify({'error': 'min_value must be less than or equal to max_value'}), 400
+        
+        records = get_filtered_records(
+            mode_id=mode_id,
+            start_time=start_time,
+            end_time=end_time,
+            min_value=min_value,
+            max_value=max_value,
+            limit=limit,
+            offset=offset,
+            aggregation=aggregation
+        )
+        
+        return jsonify({
+            'records': records,
+            'count': len(records),
+            'limit': limit,
+            'offset': offset,
+            'filters': {
+                'mode_id': mode_id,
+                'start_time': start_time,
+                'end_time': end_time,
+                'min_value': min_value,
+                'max_value': max_value,
+                'aggregation': aggregation
+            }
+        })
+    
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
+
+
+@app.route('/api/statistics')
+def api_get_statistics():
+    """API endpoint to get statistics for readings."""
+    try:
+        mode_id = request.args.get('mode_id', type=int)
+        start_time = request.args.get('start_time')
+        end_time = request.args.get('end_time')
+        min_value = request.args.get('min_value', type=float)
+        max_value = request.args.get('max_value', type=float)
+        
+        if mode_id is not None:
+            mode = get_mode_by_id(mode_id)
+            if not mode:
+                return jsonify({'error': f'Mode {mode_id} not found'}), 404
+        
+        if start_time and end_time and start_time > end_time:
+            return jsonify({'error': 'start_time must be before end_time'}), 400
+        
+        if min_value is not None and max_value is not None and min_value > max_value:
+            return jsonify({'error': 'min_value must be less than or equal to max_value'}), 400
+        
+        statistics = get_statistics(
+            mode_id=mode_id,
+            start_time=start_time,
+            end_time=end_time,
+            min_value=min_value,
+            max_value=max_value
+        )
+        
+        return jsonify({
+            'statistics': statistics,
+            'filters': {
+                'mode_id': mode_id,
+                'start_time': start_time,
+                'end_time': end_time,
+                'min_value': min_value,
+                'max_value': max_value
+            }
+        })
+    
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
 
 
 @socketio.on('connect')
