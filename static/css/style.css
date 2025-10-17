@@ -50,6 +50,16 @@ header {
     align-items: center;
 }
 
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.nav-brand .logo {
+    height: 40px;
+}
+
 .nav-brand h1 {
     font-size: 1.5rem;
     color: var(--primary-color);
@@ -392,6 +402,215 @@ footer {
     font-size: 0.875rem;
 }
 
+.mode-selection-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.mode-selection-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.mode-selection-header h1 {
+    font-size: 2.5rem;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.mode-selection-header p {
+    font-size: 1.125rem;
+    color: var(--text-light);
+}
+
+.mode-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.mode-selection-card {
+    background: var(--card-bg);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    cursor: pointer;
+    position: relative;
+}
+
+.mode-selection-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-color);
+}
+
+.mode-selection-card.active {
+    border-color: var(--success-color);
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+}
+
+.mode-selection-card.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.mode-selection-card.disabled:hover {
+    transform: none;
+    border-color: transparent;
+}
+
+.mode-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.mode-card-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.mode-card-icon {
+    font-size: 2.5rem;
+}
+
+.mode-card-title {
+    font-size: 1.5rem;
+    color: var(--text-color);
+    margin: 0;
+}
+
+.mode-card-description {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 52px;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s;
+    border-radius: 28px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--success-color);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+.toggle-switch input:disabled + .toggle-slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.mode-card-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+}
+
+.mode-card-status .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--danger-color);
+}
+
+.mode-card-status.active .status-dot {
+    background-color: var(--success-color);
+    animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.mode-card-theme {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background-color: var(--bg-color);
+    color: var(--primary-color);
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.dashboard-action {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.btn-dashboard {
+    padding: 1rem 2.5rem;
+    font-size: 1.125rem;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    display: inline-block;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-dashboard:hover:not(:disabled) {
+    background-color: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-dashboard:disabled {
+    background-color: var(--border-color);
+    color: var(--text-light);
+    cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
     .navbar .container {
         flex-direction: column;
@@ -414,8 +633,25 @@ footer {
         grid-template-columns: 1fr;
     }
     
+    .mode-cards-grid {
+        grid-template-columns: 1fr;
+    }
+    
     .dashboard-header {
         flex-direction: column;
         align-items: flex-start;
+    }
+    
+    .mode-selection-header h1 {
+        font-size: 2rem;
+    }
+    
+    .mode-selection-header p {
+        font-size: 1rem;
+    }
+    
+    .btn-dashboard {
+        padding: 0.875rem 2rem;
+        font-size: 1rem;
     }
 }

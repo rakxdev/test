@@ -27,7 +27,8 @@ def init_app():
 @app.route('/')
 def home():
     """Home page route."""
-    return render_template('home.html')
+    modes = get_all_modes()
+    return render_template('home.html', modes=modes)
 
 
 @app.route('/dashboard')
@@ -67,15 +68,20 @@ def api_toggle_mode(mode_id):
     if not mode:
         return jsonify({'error': 'Mode not found'}), 404
     
+    data = request.get_json() or {}
+    enforce_single = data.get('enforce_single_active', False)
     new_status = not mode['is_active']
-    update_mode_status(mode_id, new_status)
     
+    update_mode_status(mode_id, new_status, enforce_single_active=enforce_single)
+    
+    updated_modes = get_all_modes()
     socketio.emit('mode_status_changed', {
         'mode_id': mode_id,
-        'is_active': new_status
+        'is_active': new_status,
+        'all_modes': updated_modes
     })
     
-    return jsonify({'mode_id': mode_id, 'is_active': new_status})
+    return jsonify({'mode_id': mode_id, 'is_active': new_status, 'all_modes': updated_modes})
 
 
 @app.route('/api/readings/<int:mode_id>')
