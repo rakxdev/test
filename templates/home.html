@@ -40,6 +40,10 @@
                 {% elif mode.name == 'Light' %}Luminosity Tracking
                 {% else %}Sensor Theme{% endif %}
             </span>
+            
+            <a href="{{ url_for('dashboard_mode', mode_id=mode.id) }}" class="btn btn-mode-dashboard">
+                View {{ mode.name }} Dashboard →
+            </a>
         </div>
         {% endfor %}
     </div>

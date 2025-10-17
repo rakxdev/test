@@ -103,7 +103,7 @@ def dashboard_mode(mode_id):
         return render_template('error.html', message='Mode not found'), 404
     
     modes = get_all_modes()
-    return render_template('dashboard.html', modes=modes, selected_mode=mode)
+    return render_template('mode-dashboard.html', modes=modes, selected_mode=mode)
 
 
 @app.route('/api/mode/toggle', methods=['POST'])

@@ -11,25 +11,32 @@ A real-time sensor monitoring application built with Flask and Flask-SocketIO.
 - Advanced data simulator with Gaussian noise and drift
 - RESTful API with validation and error handling
 - Responsive web interface with mode-specific views
+- **Phase 4**: Mode-specific dashboards with control panels, digital readouts, and color-coded themes
+- **Phase 4**: Real-time WebSocket integration with connection indicators
+- **Phase 4**: Debounced voltage slider control (500ms) with visual feedback
 
 ## Project Structure
 
 ```
 .
-├── app.py              # Main Flask application with SocketIO
-├── database.py         # Database schema and operations
-├── data_simulator.py   # Sensor data simulator
-├── requirements.txt    # Python dependencies
+├── app.py                      # Main Flask application with SocketIO
+├── database.py                 # Database schema and operations
+├── data_simulator.py           # Sensor data simulator
+├── requirements.txt            # Python dependencies
 ├── static/
 │   ├── css/
-│   │   └── style.css   # Application styles
+│   │   ├── style.css           # Global application styles
+│   │   └── dashboard.css       # Mode dashboard styles (Phase 4)
 │   └── js/
-│       └── main.js     # Client-side JavaScript
+│       ├── main.js             # Common utilities
+│       ├── home.js             # Home page logic
+│       └── dashboard.js        # Mode dashboard controller (Phase 4)
 └── templates/
-    ├── base.html       # Base template
-    ├── home.html       # Home page
-    ├── dashboard.html  # Real-time dashboard
-    └── records.html    # Historical records
+    ├── base.html               # Base template
+    ├── home.html               # Home page with mode selection
+    ├── dashboard.html          # All-modes dashboard
+    ├── mode-dashboard.html     # Mode-specific dashboard (Phase 4)
+    └── records.html            # Historical records
 ```
 
 ## Installation
@@ -61,13 +68,24 @@ The application will be available at `http://localhost:5000`
 
 ## Usage
 
+### Getting Started
 1. Navigate to the **Home** page and select a sensor mode
-2. Click "View Dashboard" to access the real-time dashboard
-3. Click "Start Simulator" to begin generating sensor data
-4. Toggle individual sensor modes on/off
-5. Adjust voltage levels (0-10V) to control simulation behavior
-6. View real-time updates as data streams in
-7. Check the **Records** page for historical data
+2. Click "View [Mode Name] Dashboard" to access a mode-specific dashboard (**Phase 4**)
+3. Or click "View Dashboard" to see all modes at once
+
+### Mode-Specific Dashboard (Phase 4)
+1. **Power Control**: Toggle the mode on/off using the power switch
+2. **Voltage Control**: Adjust voltage (0-10V) using the slider - changes are debounced (500ms)
+3. **Monitor Metrics**: View real-time sensor readings, voltage, update rate, and data count
+4. **Connection Status**: Check WebSocket connection and data stream indicators
+5. **Theme**: Dashboard uses color-coded theme based on sensor type
+
+### General Operations
+1. Click "Start Simulator" to begin generating sensor data
+2. Toggle individual sensor modes on/off
+3. Adjust voltage levels (0-10V) to control simulation behavior
+4. View real-time updates as data streams in
+5. Check the **Records** page for historical data
 
 ## API Endpoints
 
@@ -92,7 +110,7 @@ The application will be available at `http://localhost:5000`
 - `voltage_changed` - Voltage updates
 - `error` - Error notifications
 
-See [PHASE3_IMPLEMENTATION.md](PHASE3_IMPLEMENTATION.md) for detailed API documentation.
+See [PHASE3_IMPLEMENTATION.md](PHASE3_IMPLEMENTATION.md) and [PHASE4_IMPLEMENTATION.md](PHASE4_IMPLEMENTATION.md) for detailed implementation documentation.
 
 ## Tech Stack
 
@@ -100,4 +118,6 @@ See [PHASE3_IMPLEMENTATION.md](PHASE3_IMPLEMENTATION.md) for detailed API docume
 - Flask-SocketIO 5.3.6
 - SQLite3
 - Eventlet for async support
-- Vanilla JavaScript (no frameworks)
+- Vanilla JavaScript ES6 (no frameworks)
+- Socket.IO client
+- CSS3 with Custom Properties
