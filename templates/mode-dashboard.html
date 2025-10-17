@@ -4,6 +4,8 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -128,13 +130,31 @@
         </div>
     </div>
 
-    <!-- Graph Container -->
-    <div class="graph-container">
-        <h2>Historical Data</h2>
-        <div class="graph-placeholder">
-            <div class="graph-icon">📈</div>
-            <p>Real-time graph visualization coming soon</p>
-            <p class="graph-note">This area will display historical sensor data over time</p>
+    <!-- Chart Container -->
+    <div class="chart-container">
+        <div class="chart-header">
+            <h2>Real-Time Visualization</h2>
+            <div class="chart-controls">
+                <button id="pauseResumeBtn" class="btn-chart-control" title="Pause/Resume data updates">
+                    ⏸ Pause
+                </button>
+                <button id="clearChartBtn" class="btn-chart-control" title="Clear all data">
+                    🗑 Clear
+                </button>
+                <button id="exportChartBtn" class="btn-chart-control" title="Export chart as PNG">
+                    📷 Export
+                </button>
+                <select id="timeRangeSelect" class="time-range-select" title="Select time window">
+                    <option value="30">30s</option>
+                    <option value="60" selected>60s</option>
+                    <option value="120">2m</option>
+                    <option value="300">5m</option>
+                    <option value="600">10m</option>
+                </select>
+            </div>
+        </div>
+        <div class="chart-canvas-wrapper">
+            <canvas id="realtimeChart"></canvas>
         </div>
     </div>
 
@@ -151,6 +171,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/chart-handler.js') }}"></script>
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 <script>
     // Initialize dashboard with mode data
@@ -163,6 +184,7 @@
         if (typeof DashboardController !== 'undefined') {
             const dashboard = new DashboardController(modeId, modeName, modeIcon);
             dashboard.init();
+            window.dashboardController = dashboard;
         }
     });
 </script>

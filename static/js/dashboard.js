@@ -16,6 +16,11 @@ class DashboardController {
         this.voltageDebounceTimer = null;
         this.voltageDebounceDelay = 500; // 500ms debounce
         
+        // Chart-related properties
+        this.chart = null;
+        this.chartPaused = false;
+        this.timeWindow = 60; // Default 60-second window
+        
         // DOM elements
         this.elements = {};
         
@@ -37,6 +42,7 @@ class DashboardController {
         this.setupEventListeners();
         this.updateTheme();
         this.setUnit();
+        this.initializeChart();
     }
 
     /**
@@ -64,6 +70,12 @@ class DashboardController {
             displayVoltage: document.getElementById('displayVoltage'),
             updateRate: document.getElementById('updateRate'),
             dataPoints: document.getElementById('dataPoints'),
+            
+            // Chart controls
+            pauseResumeBtn: document.getElementById('pauseResumeBtn'),
+            clearChartBtn: document.getElementById('clearChartBtn'),
+            exportChartBtn: document.getElementById('exportChartBtn'),
+            timeRangeSelect: document.getElementById('timeRangeSelect'),
             
             // Container
             container: document.querySelector('.mode-dashboard-container')
@@ -154,6 +166,31 @@ class DashboardController {
                 this.debouncedVoltageUpdate(e.target.value);
             });
         }
+        
+        // Chart controls
+        if (this.elements.pauseResumeBtn) {
+            this.elements.pauseResumeBtn.addEventListener('click', () => {
+                this.toggleChartPause();
+            });
+        }
+        
+        if (this.elements.clearChartBtn) {
+            this.elements.clearChartBtn.addEventListener('click', () => {
+                this.clearChart();
+            });
+        }
+        
+        if (this.elements.exportChartBtn) {
+            this.elements.exportChartBtn.addEventListener('click', () => {
+                this.exportChart();
+            });
+        }
+        
+        if (this.elements.timeRangeSelect) {
+            this.elements.timeRangeSelect.addEventListener('change', (e) => {
+                this.updateTimeWindow(parseInt(e.target.value));
+            });
+        }
     }
 
     /**
@@ -242,6 +279,11 @@ class DashboardController {
         this.updateRate();
         
         this.lastUpdateTime = Date.now();
+        
+        // Update chart if not paused
+        if (!this.chartPaused && this.chart) {
+            this.addDataToChart(data);
+        }
     }
 
     /**
@@ -457,6 +499,112 @@ class DashboardController {
     }
 
     /**
+     * Initialize the real-time chart
+     */
+    initializeChart() {
+        if (typeof ChartHandler === 'undefined') {
+            console.error('ChartHandler not loaded');
+            return;
+        }
+
+        // Get mode-specific color scheme
+        const colorScheme = ChartHandler.getModeColorScheme(this.modeName);
+        
+        // Create datasets for sensor value, voltage, and power
+        const datasets = [
+            ChartHandler.createDataset(`${this.modeName} Value`, colorScheme, []),
+            ChartHandler.createDataset('Voltage', ChartHandler.colors.voltage, []),
+            ChartHandler.createDataset('Power', ChartHandler.colors.power, [])
+        ];
+
+        // Initialize the chart
+        const unit = this.unitMap[this.modeName] || 'Value';
+        this.chart = ChartHandler.createRealtimeChart(
+            'realtimeChart',
+            `${this.modeName} Real-Time Data`,
+            unit,
+            datasets
+        );
+
+        if (!this.chart) {
+            console.error('Failed to initialize chart');
+        }
+    }
+
+    /**
+     * Add data to the chart
+     */
+    addDataToChart(data) {
+        if (!this.chart || !ChartHandler) return;
+
+        const timestamp = new Date(data.timestamp).getTime();
+        const sensorValue = parseFloat(data.value);
+        const voltage = data.voltage !== undefined ? parseFloat(data.voltage) : 0;
+        const power = sensorValue * voltage; // Simple power calculation
+
+        // Add data points to each dataset
+        ChartHandler.addDataPoint(this.chart, 0, timestamp, sensorValue);
+        ChartHandler.addDataPoint(this.chart, 1, timestamp, voltage);
+        ChartHandler.addDataPoint(this.chart, 2, timestamp, power);
+
+        // Update chart with time window pruning
+        ChartHandler.updateChart(this.chart, this.timeWindow);
+    }
+
+    /**
+     * Toggle chart pause/resume
+     */
+    toggleChartPause() {
+        this.chartPaused = !this.chartPaused;
+        
+        if (this.elements.pauseResumeBtn) {
+            if (this.chartPaused) {
+                this.elements.pauseResumeBtn.textContent = '▶ Resume';
+                this.elements.pauseResumeBtn.classList.add('paused');
+                this.showFeedback('Chart paused', 'info');
+            } else {
+                this.elements.pauseResumeBtn.textContent = '⏸ Pause';
+                this.elements.pauseResumeBtn.classList.remove('paused');
+                this.showFeedback('Chart resumed', 'success');
+            }
+        }
+    }
+
+    /**
+     * Clear all chart data
+     */
+    clearChart() {
+        if (!this.chart || !ChartHandler) return;
+
+        ChartHandler.clearChartData(this.chart);
+        this.showFeedback('Chart cleared', 'success');
+    }
+
+    /**
+     * Export chart as PNG
+     */
+    exportChart() {
+        if (!this.chart || !ChartHandler) return;
+
+        const filename = `${this.modeName.toLowerCase()}_chart`;
+        ChartHandler.exportChartAsPNG(this.chart, filename);
+        this.showFeedback('Chart exported', 'success');
+    }
+
+    /**
+     * Update time window for chart
+     */
+    updateTimeWindow(seconds) {
+        this.timeWindow = seconds;
+        
+        if (this.chart && ChartHandler) {
+            ChartHandler.updateTimeRange(this.chart, this.timeWindow);
+        }
+        
+        this.showFeedback(`Time window: ${seconds}s`, 'info');
+    }
+
+    /**
      * Cleanup when leaving page
      */
     destroy() {
@@ -467,6 +615,10 @@ class DashboardController {
         
         if (this.voltageDebounceTimer) {
             clearTimeout(this.voltageDebounceTimer);
+        }
+        
+        if (this.chart) {
+            this.chart.destroy();
         }
     }
 }
