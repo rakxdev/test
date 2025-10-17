@@ -131,13 +131,20 @@ def get_mode_by_id(mode_id):
         return dict(row) if row else None
 
 
-def update_mode_status(mode_id, is_active):
+def update_mode_status(mode_id, is_active, enforce_single_active=False):
     """Update the status of a mode."""
     with get_db_connection() as conn:
         cursor = conn.cursor()
         timestamp = datetime.now().isoformat()
         
         if is_active:
+            if enforce_single_active:
+                cursor.execute('''
+                    UPDATE mode_status 
+                    SET is_active = 0, last_deactivated = ?
+                    WHERE mode_id != ?
+                ''', (timestamp, mode_id))
+            
             cursor.execute('''
                 UPDATE mode_status 
                 SET is_active = 1, last_activated = ?

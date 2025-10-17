@@ -1,42 +1,58 @@
 {% extends "base.html" %}
 
-{% block title %}Home - Sensor Monitor{% endblock %}
+{% block title %}Home - BPUT Sensor Monitor{% endblock %}
 
 {% block content %}
-<div class="home-container">
-    <div class="hero-section">
-        <h1>Welcome to Sensor Monitor</h1>
-        <p class="lead">Real-time monitoring of temperature, humidity, pressure, and light sensors</p>
+<div class="mode-selection-container">
+    <div class="mode-selection-header">
+        <h1>Select Monitoring Mode</h1>
+        <p>Choose a sensor mode to begin monitoring. Only one mode can be active at a time.</p>
     </div>
     
-    <div class="features-grid">
-        <div class="feature-card">
-            <div class="feature-icon">🌡️</div>
-            <h3>Temperature</h3>
-            <p>Monitor temperature readings in real-time</p>
+    <div class="mode-cards-grid">
+        {% for mode in modes %}
+        <div class="mode-selection-card {% if mode.is_active %}active{% endif %}" data-mode-id="{{ mode.id }}">
+            <div class="mode-card-header">
+                <div class="mode-card-info">
+                    <span class="mode-card-icon">{{ mode.icon }}</span>
+                    <h3 class="mode-card-title">{{ mode.name }}</h3>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" 
+                           class="mode-toggle" 
+                           data-mode-id="{{ mode.id }}" 
+                           {% if mode.is_active %}checked{% endif %}>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            
+            <p class="mode-card-description">{{ mode.description }}</p>
+            
+            <div class="mode-card-status {% if mode.is_active %}active{% endif %}">
+                <span class="status-dot"></span>
+                <span>{% if mode.is_active %}Active{% else %}Inactive{% endif %}</span>
+            </div>
+            
+            <span class="mode-card-theme">
+                {% if mode.name == 'Temperature' %}Climate Monitoring
+                {% elif mode.name == 'Humidity' %}Environmental Control
+                {% elif mode.name == 'Pressure' %}Atmospheric Analysis
+                {% elif mode.name == 'Light' %}Luminosity Tracking
+                {% else %}Sensor Theme{% endif %}
+            </span>
         </div>
-        
-        <div class="feature-card">
-            <div class="feature-icon">💧</div>
-            <h3>Humidity</h3>
-            <p>Track humidity levels and trends</p>
-        </div>
-        
-        <div class="feature-card">
-            <div class="feature-icon">🔽</div>
-            <h3>Pressure</h3>
-            <p>Monitor atmospheric pressure changes</p>
-        </div>
-        
-        <div class="feature-card">
-            <div class="feature-icon">💡</div>
-            <h3>Light</h3>
-            <p>Track light intensity measurements</p>
-        </div>
+        {% endfor %}
     </div>
     
-    <div class="cta-section">
-        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+    <div class="dashboard-action">
+        <button id="viewDashboardBtn" class="btn-dashboard" {% if not modes|selectattr('is_active')|list %}disabled{% endif %}>
+            View Dashboard
+        </button>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
 {% endblock %}
