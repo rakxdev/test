@@ -3,265 +3,9 @@
 {% block title %}Records - Sensor Monitor{% endblock %}
 
 {% block extra_head %}
-<style>
-    .records-container {
-        padding: 2rem 0;
-    }
-
-    .records-header {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-
-    .records-header h1 {
-        font-size: 2.5rem;
-        margin-bottom: 0.5rem;
-        color: #2c3e50;
-    }
-
-    .subtitle {
-        color: #7f8c8d;
-        font-size: 1.1rem;
-    }
-
-    .filters-section {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 2rem;
-    }
-
-    .filters-section h2 {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-        color: #34495e;
-    }
-
-    .filters-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .filter-group {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .filter-group label {
-        font-weight: 600;
-        margin-bottom: 0.3rem;
-        color: #2c3e50;
-        font-size: 0.9rem;
-    }
-
-    .filter-group input,
-    .filter-group select {
-        padding: 0.5rem;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 0.95rem;
-    }
-
-    .filter-actions {
-        display: flex;
-        gap: 1rem;
-        margin-top: 1rem;
-    }
-
-    .btn {
-        padding: 0.6rem 1.5rem;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 1rem;
-        font-weight: 600;
-        transition: all 0.2s;
-    }
-
-    .btn-primary {
-        background: #3498db;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: #2980b9;
-    }
-
-    .btn-secondary {
-        background: #95a5a6;
-        color: white;
-    }
-
-    .btn-secondary:hover {
-        background: #7f8c8d;
-    }
-
-    .statistics-section {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 2rem;
-    }
-
-    .statistics-section h2 {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-        color: #34495e;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-    }
-
-    .stat-card {
-        background: #f8f9fa;
-        padding: 1rem;
-        border-radius: 6px;
-        border-left: 4px solid #3498db;
-    }
-
-    .stat-card h3 {
-        font-size: 0.9rem;
-        color: #7f8c8d;
-        margin-bottom: 0.5rem;
-        text-transform: uppercase;
-    }
-
-    .stat-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #2c3e50;
-    }
-
-    .records-table-container {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        overflow-x: auto;
-    }
-
-    .records-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .records-table thead {
-        background: #34495e;
-        color: white;
-    }
-
-    .records-table th,
-    .records-table td {
-        padding: 1rem;
-        text-align: left;
-        border-bottom: 1px solid #ecf0f1;
-    }
-
-    .records-table th {
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
-    }
-
-    .records-table tbody tr:hover {
-        background-color: #f8f9fa;
-    }
-
-    .mode-badge {
-        display: inline-block;
-        padding: 0.3rem 0.8rem;
-        border-radius: 4px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        background: #e8f4f8;
-        color: #2980b9;
-    }
-
-    .value-cell {
-        font-weight: 600;
-        color: #2c3e50;
-    }
-
-    .no-data {
-        text-align: center;
-        padding: 2rem;
-        color: #95a5a6;
-        font-style: italic;
-    }
-
-    .pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 1rem;
-        margin-top: 1.5rem;
-    }
-
-    .pagination button {
-        padding: 0.5rem 1rem;
-        border: 1px solid #ddd;
-        background: white;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .pagination button:hover:not(:disabled) {
-        background: #3498db;
-        color: white;
-        border-color: #3498db;
-    }
-
-    .pagination button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    .pagination-info {
-        color: #7f8c8d;
-    }
-
-    .loading {
-        text-align: center;
-        padding: 2rem;
-        color: #7f8c8d;
-    }
-
-    .error-message {
-        background: #fee;
-        color: #c33;
-        padding: 1rem;
-        border-radius: 4px;
-        margin-bottom: 1rem;
-    }
-
-    @media (max-width: 768px) {
-        .filters-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .filter-actions {
-            flex-direction: column;
-        }
-
-        .records-table {
-            font-size: 0.85rem;
-        }
-
-        .records-table th,
-        .records-table td {
-            padding: 0.5rem;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/records.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -311,9 +55,9 @@
             </div>
         </div>
         <div class="filter-actions">
-            <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
-            <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
-            <button class="btn btn-primary" onclick="loadStatistics()">Load Statistics</button>
+            <button class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
+            <button class="btn btn-secondary" id="resetFiltersBtn">Reset</button>
+            <button class="btn btn-success" id="loadStatisticsBtn">Load Statistics</button>
         </div>
     </div>
 
@@ -322,23 +66,48 @@
         <div id="statsContent"></div>
     </div>
 
+    <div id="chartSection" class="chart-section" style="display: none;">
+        <h2>Trend Visualization</h2>
+        <div class="chart-container">
+            <canvas id="recordsChart"></canvas>
+        </div>
+    </div>
+
     <div class="records-table-container">
+        <div class="table-header">
+            <h2>Records Table</h2>
+            <div class="records-per-page">
+                <label for="recordsPerPageSelect">Rows per page:</label>
+                <select id="recordsPerPageSelect">
+                    <option value="50">50</option>
+                    <option value="100" selected>100</option>
+                    <option value="200">200</option>
+                    <option value="500">500</option>
+                </select>
+            </div>
+        </div>
         <div id="errorMessage" class="error-message" style="display: none;"></div>
-        <div id="loadingMessage" class="loading" style="display: none;">Loading records...</div>
+        <div id="loadingMessage" class="loading" style="display: none;">Loading records</div>
         <table class="records-table">
             <thead>
                 <tr>
-                    <th>Mode</th>
-                    <th>Value</th>
-                    <th>Timestamp</th>
-                    <th id="aggregatedColumns" style="display: none;">Min</th>
-                    <th id="aggregatedColumns2" style="display: none;">Max</th>
-                    <th id="aggregatedColumns3" style="display: none;">Count</th>
+                    <th class="sortable" data-column="mode">Mode</th>
+                    <th class="sortable" data-column="value">Value</th>
+                    <th class="sortable" data-column="timestamp">Timestamp</th>
+                    <th id="minHeader" class="sortable" data-column="min" style="display: none;">Min</th>
+                    <th id="maxHeader" class="sortable" data-column="max" style="display: none;">Max</th>
+                    <th id="countHeader" class="sortable" data-column="count" style="display: none;">Count</th>
                 </tr>
             </thead>
             <tbody id="recordsTableBody">
                 <tr>
-                    <td colspan="6" class="no-data">Click "Apply Filters" to load records</td>
+                    <td colspan="6" class="no-data">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🔍</div>
+                            <div class="empty-state-title">Ready to search</div>
+                            <div class="empty-state-description">Click "Apply Filters" to load records</div>
+                        </div>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -352,235 +121,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
-let currentPage = 1;
-let recordsPerPage = 100;
-let currentFilters = {};
-
-function getFilters() {
-    const filters = {
-        limit: recordsPerPage,
-        offset: (currentPage - 1) * recordsPerPage
-    };
-
-    const modeId = document.getElementById('modeFilter').value;
-    if (modeId) filters.mode_id = modeId;
-
-    const startTime = document.getElementById('startTime').value;
-    if (startTime) filters.start_time = new Date(startTime).toISOString();
-
-    const endTime = document.getElementById('endTime').value;
-    if (endTime) filters.end_time = new Date(endTime).toISOString();
-
-    const minValue = document.getElementById('minValue').value;
-    if (minValue) filters.min_value = parseFloat(minValue);
-
-    const maxValue = document.getElementById('maxValue').value;
-    if (maxValue) filters.max_value = parseFloat(maxValue);
-
-    const aggregation = document.getElementById('aggregation').value;
-    if (aggregation) filters.aggregation = aggregation;
-
-    return filters;
-}
-
-async function loadRecords() {
-    const loadingMessage = document.getElementById('loadingMessage');
-    const errorMessage = document.getElementById('errorMessage');
-    const tableBody = document.getElementById('recordsTableBody');
-
-    loadingMessage.style.display = 'block';
-    errorMessage.style.display = 'none';
-    tableBody.innerHTML = '';
-
-    try {
-        currentFilters = getFilters();
-        const queryString = new URLSearchParams(currentFilters).toString();
-        const response = await fetch(`/api/records?${queryString}`);
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Failed to load records');
-        }
-
-        const data = await response.json();
-        loadingMessage.style.display = 'none';
-
-        const isAggregated = currentFilters.aggregation && currentFilters.aggregation !== 'raw';
-        
-        document.getElementById('aggregatedColumns').style.display = isAggregated ? '' : 'none';
-        document.getElementById('aggregatedColumns2').style.display = isAggregated ? '' : 'none';
-        document.getElementById('aggregatedColumns3').style.display = isAggregated ? '' : 'none';
-
-        if (data.records.length === 0) {
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="6" class="no-data">No records found matching your filters</td>
-                </tr>
-            `;
-        } else {
-            tableBody.innerHTML = data.records.map(record => {
-                if (isAggregated) {
-                    return `
-                        <tr>
-                            <td>
-                                <span class="mode-badge">
-                                    ${record.icon} ${record.mode_name}
-                                </span>
-                            </td>
-                            <td class="value-cell">${record.value.toFixed(2)}</td>
-                            <td>${new Date(record.timestamp).toLocaleString()}</td>
-                            <td class="value-cell">${record.min_value.toFixed(2)}</td>
-                            <td class="value-cell">${record.max_value.toFixed(2)}</td>
-                            <td>${record.count}</td>
-                        </tr>
-                    `;
-                } else {
-                    return `
-                        <tr>
-                            <td>
-                                <span class="mode-badge">
-                                    ${record.icon} ${record.mode_name}
-                                </span>
-                            </td>
-                            <td class="value-cell">${record.value.toFixed(2)}</td>
-                            <td>${new Date(record.timestamp).toLocaleString()}</td>
-                        </tr>
-                    `;
-                }
-            }).join('');
-        }
-
-        updatePagination(data.count);
-    } catch (error) {
-        loadingMessage.style.display = 'none';
-        errorMessage.textContent = error.message;
-        errorMessage.style.display = 'block';
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="6" class="no-data">Error loading records. Please try again.</td>
-            </tr>
-        `;
-    }
-}
-
-function updatePagination(count) {
-    const prevButton = document.getElementById('prevButton');
-    const nextButton = document.getElementById('nextButton');
-    const paginationInfo = document.getElementById('paginationInfo');
-
-    prevButton.disabled = currentPage === 1;
-    nextButton.disabled = count < recordsPerPage;
-    
-    const startRecord = (currentPage - 1) * recordsPerPage + 1;
-    const endRecord = Math.min(currentPage * recordsPerPage, startRecord + count - 1);
-    paginationInfo.textContent = count > 0 
-        ? `Showing ${startRecord}-${endRecord} (Page ${currentPage})`
-        : `Page ${currentPage}`;
-}
-
-function applyFilters() {
-    currentPage = 1;
-    loadRecords();
-}
-
-function resetFilters() {
-    document.getElementById('modeFilter').value = '';
-    document.getElementById('startTime').value = '';
-    document.getElementById('endTime').value = '';
-    document.getElementById('minValue').value = '';
-    document.getElementById('maxValue').value = '';
-    document.getElementById('aggregation').value = 'raw';
-    currentPage = 1;
-    
-    document.getElementById('recordsTableBody').innerHTML = `
-        <tr>
-            <td colspan="6" class="no-data">Click "Apply Filters" to load records</td>
-        </tr>
-    `;
-    document.getElementById('statisticsSection').style.display = 'none';
-}
-
-function previousPage() {
-    if (currentPage > 1) {
-        currentPage--;
-        loadRecords();
-    }
-}
-
-function nextPage() {
-    currentPage++;
-    loadRecords();
-}
-
-async function loadStatistics() {
-    const filters = getFilters();
-    delete filters.limit;
-    delete filters.offset;
-    delete filters.aggregation;
-
-    try {
-        const queryString = new URLSearchParams(filters).toString();
-        const response = await fetch(`/api/statistics?${queryString}`);
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Failed to load statistics');
-        }
-
-        const data = await response.json();
-        const statsSection = document.getElementById('statisticsSection');
-        const statsContent = document.getElementById('statsContent');
-
-        if (data.statistics && (Array.isArray(data.statistics) ? data.statistics.length > 0 : data.statistics)) {
-            const stats = Array.isArray(data.statistics) ? data.statistics : [data.statistics];
-            
-            statsContent.innerHTML = stats.map(stat => `
-                <div style="margin-bottom: 1.5rem;">
-                    <h3 style="margin-bottom: 1rem; color: #2c3e50;">
-                        ${stat.icon} ${stat.mode_name}
-                    </h3>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <h3>Count</h3>
-                            <div class="stat-value">${stat.count}</div>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Average</h3>
-                            <div class="stat-value">${stat.average.toFixed(2)}</div>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Minimum</h3>
-                            <div class="stat-value">${stat.minimum.toFixed(2)}</div>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Maximum</h3>
-                            <div class="stat-value">${stat.maximum.toFixed(2)}</div>
-                        </div>
-                        <div class="stat-card">
-                            <h3>First Reading</h3>
-                            <div class="stat-value" style="font-size: 0.9rem;">
-                                ${new Date(stat.first_reading).toLocaleString()}
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Last Reading</h3>
-                            <div class="stat-value" style="font-size: 0.9rem;">
-                                ${new Date(stat.last_reading).toLocaleString()}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-
-            statsSection.style.display = 'block';
-        } else {
-            statsContent.innerHTML = '<p class="no-data">No statistics available for the selected filters</p>';
-            statsSection.style.display = 'block';
-        }
-    } catch (error) {
-        alert(`Error loading statistics: ${error.message}`);
-    }
-}
-</script>
+<script src="{{ url_for('static', filename='js/records.js') }}"></script>
 {% endblock %}
