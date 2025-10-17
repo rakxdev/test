@@ -17,6 +17,9 @@ A real-time sensor monitoring application built with Flask and Flask-SocketIO.
 - **Phase 5**: Real-time Chart.js scrolling visualization with multiple datasets
 - **Phase 5**: Chart controls: pause/resume, clear, PNG export, time range selector
 - **Phase 5**: 60-second scrolling window with auto-scaling and old data pruning
+- **Phase 6**: Records API with filtering, pagination, and aggregation intervals
+- **Phase 6**: Statistics endpoint with comprehensive metrics calculation
+- **Phase 6**: Interactive records page with filter controls and dynamic data loading
 
 ## Project Structure
 
@@ -107,6 +110,8 @@ The application will be available at `http://localhost:5000`
 ### Readings
 - `GET /api/readings/<mode_id>` - Get recent readings
 - `GET /api/current-reading/<mode_id>` - Get latest reading
+- `GET /api/records` - Get filtered and paginated records with aggregation (Phase 6)
+- `GET /api/statistics` - Get statistics for readings (Phase 6)
 
 ### WebSocket Events
 - `connect` / `disconnect` - Connection management
@@ -116,7 +121,7 @@ The application will be available at `http://localhost:5000`
 - `voltage_changed` - Voltage updates
 - `error` - Error notifications
 
-See [PHASE3_IMPLEMENTATION.md](PHASE3_IMPLEMENTATION.md), [PHASE4_IMPLEMENTATION.md](PHASE4_IMPLEMENTATION.md), and [PHASE5_IMPLEMENTATION.md](PHASE5_IMPLEMENTATION.md) for detailed implementation documentation.
+See [PHASE3_IMPLEMENTATION.md](PHASE3_IMPLEMENTATION.md), [PHASE4_IMPLEMENTATION.md](PHASE4_IMPLEMENTATION.md), [PHASE5_IMPLEMENTATION.md](PHASE5_IMPLEMENTATION.md), and [PHASE6_IMPLEMENTATION.md](PHASE6_IMPLEMENTATION.md) for detailed implementation documentation.
 
 ## Tech Stack
 

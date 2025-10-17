@@ -76,6 +76,12 @@ def init_db():
             ON readings(mode_id)
         ''')
         
+        # Create composite index for efficient filtered queries
+        cursor.execute('''
+            CREATE INDEX IF NOT EXISTS idx_readings_mode_timestamp 
+            ON readings(mode_id, timestamp)
+        ''')
+        
         # Seed initial mode metadata
         seed_modes(cursor)
         
@@ -258,6 +264,177 @@ def get_active_modes():
             ORDER BY m.id
         ''')
         return [dict(row) for row in cursor.fetchall()]
+
+
+def get_filtered_records(mode_id=None, start_time=None, end_time=None, 
+                        min_value=None, max_value=None, limit=100, offset=0,
+                        aggregation=None):
+    """
+    Get filtered and optionally aggregated records with pagination.
+    
+    Args:
+        mode_id: Filter by mode ID
+        start_time: Filter by start datetime (ISO format string)
+        end_time: Filter by end datetime (ISO format string)
+        min_value: Filter by minimum value
+        max_value: Filter by maximum value
+        limit: Maximum number of records to return
+        offset: Number of records to skip
+        aggregation: Aggregation interval ('raw', '1min', '5min', '15min', '60min')
+    
+    Returns:
+        List of dictionaries containing reading data
+    """
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        
+        params = []
+        where_clauses = []
+        
+        if aggregation and aggregation != 'raw':
+            interval_map = {
+                '1min': 60,
+                '5min': 300,
+                '15min': 900,
+                '60min': 3600
+            }
+            
+            if aggregation not in interval_map:
+                raise ValueError(f"Invalid aggregation interval: {aggregation}")
+            
+            interval_seconds = interval_map[aggregation]
+            
+            query = '''
+                SELECT 
+                    r.mode_id,
+                    m.name as mode_name,
+                    m.icon,
+                    AVG(r.value) as value,
+                    MIN(r.value) as min_value,
+                    MAX(r.value) as max_value,
+                    COUNT(r.id) as count,
+                    datetime((strftime('%s', r.timestamp) / ?) * ?, 'unixepoch') as timestamp
+                FROM readings r
+                JOIN modes m ON r.mode_id = m.id
+            '''
+            params.extend([interval_seconds, interval_seconds])
+        else:
+            query = '''
+                SELECT 
+                    r.id,
+                    r.mode_id,
+                    m.name as mode_name,
+                    m.icon,
+                    r.value,
+                    r.timestamp
+                FROM readings r
+                JOIN modes m ON r.mode_id = m.id
+            '''
+        
+        if mode_id is not None:
+            where_clauses.append('r.mode_id = ?')
+            params.append(mode_id)
+        
+        if start_time:
+            where_clauses.append('r.timestamp >= ?')
+            params.append(start_time)
+        
+        if end_time:
+            where_clauses.append('r.timestamp <= ?')
+            params.append(end_time)
+        
+        if min_value is not None:
+            where_clauses.append('r.value >= ?')
+            params.append(min_value)
+        
+        if max_value is not None:
+            where_clauses.append('r.value <= ?')
+            params.append(max_value)
+        
+        if where_clauses:
+            query += ' WHERE ' + ' AND '.join(where_clauses)
+        
+        if aggregation and aggregation != 'raw':
+            query += ' GROUP BY r.mode_id, datetime((strftime(\'%s\', r.timestamp) / ?) * ?)'
+            params.extend([interval_seconds, interval_seconds])
+        
+        query += ' ORDER BY r.timestamp DESC'
+        query += ' LIMIT ? OFFSET ?'
+        params.extend([limit, offset])
+        
+        cursor.execute(query, params)
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def get_statistics(mode_id=None, start_time=None, end_time=None, 
+                   min_value=None, max_value=None):
+    """
+    Calculate statistics for readings with optional filtering.
+    
+    Args:
+        mode_id: Filter by mode ID
+        start_time: Filter by start datetime (ISO format string)
+        end_time: Filter by end datetime (ISO format string)
+        min_value: Filter by minimum value
+        max_value: Filter by maximum value
+    
+    Returns:
+        Dictionary containing statistics (min, max, avg, count) per mode
+    """
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        
+        params = []
+        where_clauses = []
+        
+        query = '''
+            SELECT 
+                r.mode_id,
+                m.name as mode_name,
+                m.icon,
+                COUNT(r.id) as count,
+                AVG(r.value) as average,
+                MIN(r.value) as minimum,
+                MAX(r.value) as maximum,
+                MIN(r.timestamp) as first_reading,
+                MAX(r.timestamp) as last_reading
+            FROM readings r
+            JOIN modes m ON r.mode_id = m.id
+        '''
+        
+        if mode_id is not None:
+            where_clauses.append('r.mode_id = ?')
+            params.append(mode_id)
+        
+        if start_time:
+            where_clauses.append('r.timestamp >= ?')
+            params.append(start_time)
+        
+        if end_time:
+            where_clauses.append('r.timestamp <= ?')
+            params.append(end_time)
+        
+        if min_value is not None:
+            where_clauses.append('r.value >= ?')
+            params.append(min_value)
+        
+        if max_value is not None:
+            where_clauses.append('r.value <= ?')
+            params.append(max_value)
+        
+        if where_clauses:
+            query += ' WHERE ' + ' AND '.join(where_clauses)
+        
+        query += ' GROUP BY r.mode_id, m.name, m.icon'
+        query += ' ORDER BY r.mode_id'
+        
+        cursor.execute(query, params)
+        results = [dict(row) for row in cursor.fetchall()]
+        
+        if mode_id is not None:
+            return results[0] if results else None
+        
+        return results
 
 
 if __name__ == '__main__':
