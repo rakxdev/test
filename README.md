@@ -14,6 +14,9 @@ A real-time sensor monitoring application built with Flask and Flask-SocketIO.
 - **Phase 4**: Mode-specific dashboards with control panels, digital readouts, and color-coded themes
 - **Phase 4**: Real-time WebSocket integration with connection indicators
 - **Phase 4**: Debounced voltage slider control (500ms) with visual feedback
+- **Phase 5**: Real-time Chart.js scrolling visualization with multiple datasets
+- **Phase 5**: Chart controls: pause/resume, clear, PNG export, time range selector
+- **Phase 5**: 60-second scrolling window with auto-scaling and old data pruning
 
 ## Project Structure
 
@@ -26,11 +29,12 @@ A real-time sensor monitoring application built with Flask and Flask-SocketIO.
 ├── static/
 │   ├── css/
 │   │   ├── style.css           # Global application styles
-│   │   └── dashboard.css       # Mode dashboard styles (Phase 4)
+│   │   └── dashboard.css       # Mode dashboard styles (Phase 4, 5)
 │   └── js/
 │       ├── main.js             # Common utilities
 │       ├── home.js             # Home page logic
-│       └── dashboard.js        # Mode dashboard controller (Phase 4)
+│       ├── chart-handler.js    # Chart.js utilities (Phase 5)
+│       └── dashboard.js        # Mode dashboard controller (Phase 4, 5)
 └── templates/
     ├── base.html               # Base template
     ├── home.html               # Home page with mode selection
@@ -73,12 +77,14 @@ The application will be available at `http://localhost:5000`
 2. Click "View [Mode Name] Dashboard" to access a mode-specific dashboard (**Phase 4**)
 3. Or click "View Dashboard" to see all modes at once
 
-### Mode-Specific Dashboard (Phase 4)
+### Mode-Specific Dashboard (Phase 4 & 5)
 1. **Power Control**: Toggle the mode on/off using the power switch
 2. **Voltage Control**: Adjust voltage (0-10V) using the slider - changes are debounced (500ms)
 3. **Monitor Metrics**: View real-time sensor readings, voltage, update rate, and data count
 4. **Connection Status**: Check WebSocket connection and data stream indicators
 5. **Theme**: Dashboard uses color-coded theme based on sensor type
+6. **Real-Time Chart** (Phase 5): View scrolling visualization with three datasets (value, voltage, power)
+7. **Chart Controls** (Phase 5): Pause/resume updates, clear data, export as PNG, adjust time window
 
 ### General Operations
 1. Click "Start Simulator" to begin generating sensor data
@@ -110,7 +116,7 @@ The application will be available at `http://localhost:5000`
 - `voltage_changed` - Voltage updates
 - `error` - Error notifications
 
-See [PHASE3_IMPLEMENTATION.md](PHASE3_IMPLEMENTATION.md) and [PHASE4_IMPLEMENTATION.md](PHASE4_IMPLEMENTATION.md) for detailed implementation documentation.
+See [PHASE3_IMPLEMENTATION.md](PHASE3_IMPLEMENTATION.md), [PHASE4_IMPLEMENTATION.md](PHASE4_IMPLEMENTATION.md), and [PHASE5_IMPLEMENTATION.md](PHASE5_IMPLEMENTATION.md) for detailed implementation documentation.
 
 ## Tech Stack
 
@@ -120,4 +126,5 @@ See [PHASE3_IMPLEMENTATION.md](PHASE3_IMPLEMENTATION.md) and [PHASE4_IMPLEMENTAT
 - Eventlet for async support
 - Vanilla JavaScript ES6 (no frameworks)
 - Socket.IO client
+- Chart.js 4.4.0 with date-fns adapter (Phase 5)
 - CSS3 with Custom Properties
