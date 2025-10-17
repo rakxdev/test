@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Sensor Monitor{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Sensor Dashboard</h1>
+        <div class="simulator-controls">
+            <button id="startSimulator" class="btn btn-success">Start Simulator</button>
+            <button id="stopSimulator" class="btn btn-danger" style="display: none;">Stop Simulator</button>
+            <span id="simulatorStatus" class="status-badge">Stopped</span>
+        </div>
+    </div>
+    
+    <div class="modes-grid">
+        {% for mode in modes %}
+        <div class="mode-card" data-mode-id="{{ mode.id }}">
+            <div class="mode-header">
+                <span class="mode-icon">{{ mode.icon }}</span>
+                <h3>{{ mode.name }}</h3>
+            </div>
+            <p class="mode-description">{{ mode.description }}</p>
+            <div class="mode-status">
+                <span class="status-label">Status:</span>
+                <span class="status-indicator {% if mode.is_active %}active{% else %}inactive{% endif %}">
+                    {% if mode.is_active %}Active{% else %}Inactive{% endif %}
+                </span>
+            </div>
+            <div class="mode-value">
+                <span class="value-display" id="value-{{ mode.id }}">--</span>
+            </div>
+            <button class="btn btn-toggle" data-mode-id="{{ mode.id }}" data-active="{{ mode.is_active }}">
+                {% if mode.is_active %}Deactivate{% else %}Activate{% endif %}
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const socket = io();
+    
+    socket.on('connect', function() {
+        console.log('Connected to server');
+    });
+    
+    socket.on('new_reading', function(data) {
+        const valueElement = document.getElementById(`value-${data.mode_id}`);
+        if (valueElement) {
+            valueElement.textContent = data.value;
+            valueElement.classList.add('updated');
+            setTimeout(() => valueElement.classList.remove('updated'), 500);
+        }
+    });
+    
+    socket.on('mode_status_changed', function(data) {
+        const card = document.querySelector(`.mode-card[data-mode-id="${data.mode_id}"]`);
+        if (card) {
+            const indicator = card.querySelector('.status-indicator');
+            const button = card.querySelector('.btn-toggle');
+            
+            if (data.is_active) {
+                indicator.textContent = 'Active';
+                indicator.classList.add('active');
+                indicator.classList.remove('inactive');
+                button.textContent = 'Deactivate';
+            } else {
+                indicator.textContent = 'Inactive';
+                indicator.classList.add('inactive');
+                indicator.classList.remove('active');
+                button.textContent = 'Activate';
+            }
+        }
+    });
+    
+    socket.on('simulator_status', function(data) {
+        const startBtn = document.getElementById('startSimulator');
+        const stopBtn = document.getElementById('stopSimulator');
+        const status = document.getElementById('simulatorStatus');
+        
+        if (data.running) {
+            startBtn.style.display = 'none';
+            stopBtn.style.display = 'inline-block';
+            status.textContent = 'Running';
+            status.classList.add('active');
+        } else {
+            startBtn.style.display = 'inline-block';
+            stopBtn.style.display = 'none';
+            status.textContent = 'Stopped';
+            status.classList.remove('active');
+        }
+    });
+    
+    document.getElementById('startSimulator').addEventListener('click', function() {
+        socket.emit('start_simulator');
+    });
+    
+    document.getElementById('stopSimulator').addEventListener('click', function() {
+        socket.emit('stop_simulator');
+    });
+    
+    document.querySelectorAll('.btn-toggle').forEach(button => {
+        button.addEventListener('click', async function() {
+            const modeId = this.dataset.modeId;
+            try {
+                const response = await fetch(`/api/modes/${modeId}/toggle`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                console.log('Mode toggled:', data);
+            } catch (error) {
+                console.error('Error toggling mode:', error);
+            }
+        });
+    });
+</script>
+{% endblock %}
