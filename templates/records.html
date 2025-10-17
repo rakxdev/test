@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Records - Sensor Monitor{% endblock %}
+
+{% block content %}
+<div class="records-container">
+    <div class="records-header">
+        <h1>Sensor Records</h1>
+        <p class="subtitle">View historical sensor readings</p>
+    </div>
+    
+    <div class="records-table-container">
+        <table class="records-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Mode</th>
+                    <th>Value</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if readings %}
+                    {% for reading in readings %}
+                    <tr>
+                        <td>{{ reading.id }}</td>
+                        <td>
+                            <span class="mode-badge">
+                                {{ reading.icon }} {{ reading.mode_name }}
+                            </span>
+                        </td>
+                        <td class="value-cell">{{ reading.value }}</td>
+                        <td>{{ reading.timestamp }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="no-data">No readings available yet. Start the simulator on the dashboard to generate data.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    
+    {% if readings %}
+    <div class="records-footer">
+        <p>Showing {{ readings|length }} most recent readings</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
