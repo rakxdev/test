@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}{{ selected_mode.name }} Dashboard - Sensor Monitor{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="mode-dashboard-container" data-mode-id="{{ selected_mode.id }}" data-mode-name="{{ selected_mode.name }}">
+    <!-- Dashboard Header -->
+    <div class="mode-dashboard-header">
+        <div class="mode-info">
+            <span class="mode-icon-large">{{ selected_mode.icon }}</span>
+            <div class="mode-title-group">
+                <h1>{{ selected_mode.name }} Dashboard</h1>
+                <p class="mode-subtitle">{{ selected_mode.description }}</p>
+            </div>
+        </div>
+        <div class="connection-indicators">
+            <div class="connection-status">
+                <span class="status-dot" id="wsConnectionStatus"></span>
+                <span class="status-text" id="wsConnectionText">Connecting...</span>
+            </div>
+            <div class="data-stream-status">
+                <span class="stream-indicator" id="dataStreamIndicator"></span>
+                <span class="status-text" id="dataStreamText">Waiting for data...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="control-panel">
+        <div class="control-section">
+            <h2>Controls</h2>
+            
+            <!-- Power Toggle -->
+            <div class="control-item">
+                <div class="control-label">
+                    <span class="control-icon">⚡</span>
+                    <div>
+                        <label for="powerToggle">Power</label>
+                        <p class="control-description">Turn sensor mode on/off</p>
+                    </div>
+                </div>
+                <div class="toggle-switch">
+                    <input type="checkbox" id="powerToggle" {% if selected_mode.is_active %}checked{% endif %}>
+                    <span class="toggle-slider"></span>
+                </div>
+            </div>
+
+            <!-- Voltage Slider -->
+            <div class="control-item voltage-control">
+                <div class="control-label">
+                    <span class="control-icon">🔋</span>
+                    <div>
+                        <label for="voltageSlider">Voltage Control</label>
+                        <p class="control-description">Adjust simulation voltage (0-10V)</p>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <input type="range" id="voltageSlider" class="voltage-slider" 
+                           min="0" max="10" step="0.1" 
+                           value="{{ selected_mode.voltage }}" 
+                           {% if not selected_mode.is_active %}disabled{% endif %}>
+                    <div class="voltage-display">
+                        <span id="voltageValue">{{ "%.1f"|format(selected_mode.voltage) }}</span>
+                        <span class="voltage-unit">V</span>
+                    </div>
+                </div>
+                <div class="voltage-feedback" id="voltageFeedback"></div>
+            </div>
+
+            <!-- Mode Status -->
+            <div class="control-item mode-status-display">
+                <div class="status-label">Status:</div>
+                <div class="status-value" id="modeStatus">
+                    {% if selected_mode.is_active %}
+                        <span class="status-badge active">Active</span>
+                    {% else %}
+                        <span class="status-badge inactive">Inactive</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Digital Readouts -->
+    <div class="digital-readouts">
+        <h2>Real-Time Metrics</h2>
+        <div class="readouts-grid">
+            <!-- Current Value -->
+            <div class="readout-card primary-readout">
+                <div class="readout-label">Current Value</div>
+                <div class="readout-value" id="currentValue">
+                    <span class="value-number">--</span>
+                    <span class="value-unit" id="valueUnit"></span>
+                </div>
+                <div class="readout-timestamp" id="lastUpdated">No data yet</div>
+            </div>
+
+            <!-- Voltage Reading -->
+            <div class="readout-card">
+                <div class="readout-label">Voltage</div>
+                <div class="readout-value secondary">
+                    <span class="value-number" id="displayVoltage">{{ "%.1f"|format(selected_mode.voltage) }}</span>
+                    <span class="value-unit">V</span>
+                </div>
+            </div>
+
+            <!-- Update Rate -->
+            <div class="readout-card">
+                <div class="readout-label">Update Rate</div>
+                <div class="readout-value secondary">
+                    <span class="value-number" id="updateRate">0</span>
+                    <span class="value-unit">Hz</span>
+                </div>
+            </div>
+
+            <!-- Data Points -->
+            <div class="readout-card">
+                <div class="readout-label">Data Points</div>
+                <div class="readout-value secondary">
+                    <span class="value-number" id="dataPoints">0</span>
+                    <span class="value-unit">total</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graph Container -->
+    <div class="graph-container">
+        <h2>Historical Data</h2>
+        <div class="graph-placeholder">
+            <div class="graph-icon">📈</div>
+            <p>Real-time graph visualization coming soon</p>
+            <p class="graph-note">This area will display historical sensor data over time</p>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+            ← Back to All Modes
+        </a>
+        <a href="{{ url_for('records') }}" class="btn btn-secondary">
+            View Records
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+    // Initialize dashboard with mode data
+    document.addEventListener('DOMContentLoaded', function() {
+        const modeId = {{ selected_mode.id }};
+        const modeName = "{{ selected_mode.name }}";
+        const modeIcon = "{{ selected_mode.icon }}";
+        
+        // Initialize the dashboard
+        if (typeof DashboardController !== 'undefined') {
+            const dashboard = new DashboardController(modeId, modeName, modeIcon);
+            dashboard.init();
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,715 @@
+/**
+ * Dashboard CSS - Mode-specific dashboard styling
+ * Includes responsive behavior and color-coded themes
+ */
+
+/* Color themes for different modes */
+:root {
+    /* Temperature theme - Red/Orange */
+    --temp-primary: #ef4444;
+    --temp-secondary: #f97316;
+    --temp-light: #fee2e2;
+    --temp-dark: #dc2626;
+    
+    /* Humidity theme - Blue */
+    --humidity-primary: #3b82f6;
+    --humidity-secondary: #06b6d4;
+    --humidity-light: #dbeafe;
+    --humidity-dark: #2563eb;
+    
+    /* Pressure theme - Purple */
+    --pressure-primary: #8b5cf6;
+    --pressure-secondary: #a855f7;
+    --pressure-light: #ede9fe;
+    --pressure-dark: #7c3aed;
+    
+    /* Light theme - Yellow/Amber */
+    --light-primary: #f59e0b;
+    --light-secondary: #eab308;
+    --light-light: #fef3c7;
+    --light-dark: #d97706;
+}
+
+/* Dashboard Container */
+.mode-dashboard-container {
+    padding: 1rem 0;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Dashboard Header */
+.mode-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow);
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.mode-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.mode-icon-large {
+    font-size: 4rem;
+    line-height: 1;
+}
+
+.mode-title-group h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: var(--text-color);
+}
+
+.mode-subtitle {
+    margin: 0.5rem 0 0 0;
+    color: var(--text-light);
+    font-size: 1rem;
+}
+
+/* Connection Indicators */
+.connection-indicators {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.connection-status,
+.data-stream-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--bg-color);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.status-dot.connected {
+    background-color: var(--success-color);
+    box-shadow: 0 0 8px var(--success-color);
+    animation: pulse-glow 2s infinite;
+}
+
+.status-dot.disconnected {
+    background-color: var(--danger-color);
+}
+
+.stream-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.stream-indicator.active {
+    background-color: var(--success-color);
+    animation: blink 1.5s infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 8px var(--success-color);
+    }
+    50% {
+        box-shadow: 0 0 16px var(--success-color);
+    }
+}
+
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.3;
+    }
+}
+
+/* Control Panel */
+.control-panel {
+    margin-bottom: 2rem;
+    background: var(--card-bg);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+}
+
+.control-section h2 {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.5rem;
+    color: var(--text-color);
+}
+
+.control-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem;
+    background: var(--bg-color);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.control-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.control-label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.control-icon {
+    font-size: 1.75rem;
+    line-height: 1;
+}
+
+.control-label label {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-color);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.control-description {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    margin: 0;
+}
+
+/* Voltage Control */
+.voltage-control {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.voltage-control .control-label {
+    margin-bottom: 1rem;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.voltage-slider {
+    flex: 1;
+    height: 8px;
+    border-radius: 4px;
+    outline: none;
+    -webkit-appearance: none;
+    background: linear-gradient(to right, #e5e7eb 0%, var(--primary-color) 100%);
+    cursor: pointer;
+}
+
+.voltage-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.voltage-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.voltage-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.voltage-slider::-moz-range-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.voltage-slider:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.voltage-display {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    min-width: 80px;
+}
+
+.voltage-unit {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-light);
+}
+
+.voltage-feedback {
+    margin-top: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.voltage-feedback.success {
+    background-color: #d1fae5;
+    color: var(--success-color);
+}
+
+.voltage-feedback.error {
+    background-color: #fee2e2;
+    color: var(--danger-color);
+}
+
+.voltage-feedback.info {
+    background-color: #dbeafe;
+    color: var(--primary-color);
+}
+
+/* Mode Status Display */
+.mode-status-display {
+    border: 2px solid var(--border-color);
+    background: white;
+}
+
+.status-label {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.status-value {
+    display: flex;
+    align-items: center;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.active {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.status-badge.inactive {
+    background-color: var(--border-color);
+    color: var(--text-light);
+}
+
+/* Digital Readouts */
+.digital-readouts {
+    margin-bottom: 2rem;
+}
+
+.digital-readouts h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+    color: var(--text-color);
+}
+
+.readouts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+.readout-card {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.readout-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.readout-card.primary-readout {
+    grid-column: span 2;
+    border: 2px solid var(--primary-color);
+}
+
+.readout-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+}
+
+.readout-value {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.readout-value .value-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1;
+}
+
+.readout-value.secondary .value-number {
+    font-size: 1.75rem;
+}
+
+.readout-value .value-unit {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text-light);
+}
+
+.readout-timestamp {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    margin-top: 0.5rem;
+}
+
+.readout-card.pulse {
+    animation: readout-pulse 0.5s ease-in-out;
+}
+
+@keyframes readout-pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+}
+
+/* Graph Container */
+.graph-container {
+    margin-bottom: 2rem;
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow);
+}
+
+.graph-container h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+    color: var(--text-color);
+}
+
+.graph-placeholder {
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-color);
+    border: 2px dashed var(--border-color);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+}
+
+.graph-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.graph-placeholder p {
+    margin: 0.5rem 0;
+    color: var(--text-light);
+}
+
+.graph-note {
+    font-size: 0.875rem;
+}
+
+/* Quick Actions */
+.quick-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-secondary {
+    background-color: var(--border-color);
+    color: var(--text-color);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.btn-secondary:hover {
+    background-color: var(--text-light);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+/* Theme-specific styles */
+
+/* Temperature Theme */
+.theme-temperature .mode-icon-large {
+    color: var(--temp-primary);
+}
+
+.theme-temperature .readout-value .value-number {
+    color: var(--temp-primary);
+}
+
+.theme-temperature .voltage-slider {
+    background: linear-gradient(to right, #e5e7eb 0%, var(--temp-secondary) 100%);
+}
+
+.theme-temperature .voltage-slider::-webkit-slider-thumb {
+    background: var(--temp-primary);
+}
+
+.theme-temperature .voltage-slider::-moz-range-thumb {
+    background: var(--temp-primary);
+}
+
+.theme-temperature .readout-card.primary-readout {
+    border-color: var(--temp-primary);
+}
+
+.theme-temperature .status-badge.active {
+    background-color: var(--temp-primary);
+}
+
+/* Humidity Theme */
+.theme-humidity .mode-icon-large {
+    color: var(--humidity-primary);
+}
+
+.theme-humidity .readout-value .value-number {
+    color: var(--humidity-primary);
+}
+
+.theme-humidity .voltage-slider {
+    background: linear-gradient(to right, #e5e7eb 0%, var(--humidity-secondary) 100%);
+}
+
+.theme-humidity .voltage-slider::-webkit-slider-thumb {
+    background: var(--humidity-primary);
+}
+
+.theme-humidity .voltage-slider::-moz-range-thumb {
+    background: var(--humidity-primary);
+}
+
+.theme-humidity .readout-card.primary-readout {
+    border-color: var(--humidity-primary);
+}
+
+.theme-humidity .status-badge.active {
+    background-color: var(--humidity-primary);
+}
+
+/* Pressure Theme */
+.theme-pressure .mode-icon-large {
+    color: var(--pressure-primary);
+}
+
+.theme-pressure .readout-value .value-number {
+    color: var(--pressure-primary);
+}
+
+.theme-pressure .voltage-slider {
+    background: linear-gradient(to right, #e5e7eb 0%, var(--pressure-secondary) 100%);
+}
+
+.theme-pressure .voltage-slider::-webkit-slider-thumb {
+    background: var(--pressure-primary);
+}
+
+.theme-pressure .voltage-slider::-moz-range-thumb {
+    background: var(--pressure-primary);
+}
+
+.theme-pressure .readout-card.primary-readout {
+    border-color: var(--pressure-primary);
+}
+
+.theme-pressure .status-badge.active {
+    background-color: var(--pressure-primary);
+}
+
+/* Light Theme */
+.theme-light .mode-icon-large {
+    color: var(--light-primary);
+}
+
+.theme-light .readout-value .value-number {
+    color: var(--light-primary);
+}
+
+.theme-light .voltage-slider {
+    background: linear-gradient(to right, #e5e7eb 0%, var(--light-secondary) 100%);
+}
+
+.theme-light .voltage-slider::-webkit-slider-thumb {
+    background: var(--light-primary);
+}
+
+.theme-light .voltage-slider::-moz-range-thumb {
+    background: var(--light-primary);
+}
+
+.theme-light .readout-card.primary-readout {
+    border-color: var(--light-primary);
+}
+
+.theme-light .status-badge.active {
+    background-color: var(--light-primary);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .readouts-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .readout-card.primary-readout {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .mode-dashboard-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .mode-info {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .connection-indicators {
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .mode-title-group h1 {
+        font-size: 1.5rem;
+    }
+    
+    .mode-icon-large {
+        font-size: 3rem;
+    }
+    
+    .readouts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .readout-card.primary-readout {
+        grid-column: span 1;
+    }
+    
+    .slider-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .voltage-display {
+        justify-content: center;
+        margin-top: 0.75rem;
+    }
+    
+    .quick-actions {
+        flex-direction: column;
+    }
+    
+    .btn-secondary {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .mode-title-group h1 {
+        font-size: 1.25rem;
+    }
+    
+    .control-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .control-label {
+        margin-bottom: 1rem;
+    }
+    
+    .toggle-switch {
+        align-self: center;
+    }
+    
+    .readout-value .value-number {
+        font-size: 2rem;
+    }
+    
+    .readout-value.secondary .value-number {
+        font-size: 1.5rem;
+    }
+}
